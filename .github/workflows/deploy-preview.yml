@@ -30,7 +30,7 @@ jobs:
           node-version: 22
       - name: Update Quartz
         run: |
-          git config pull.rebase >&- || git config pull.rebase false
+          git config pull.rebase >&- || git config pull.rebase true
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
           git config remote.template.url >&- || git remote add template https://github.com/quartz-themes/quartz-themes-preview-template.git
@@ -42,6 +42,15 @@ jobs:
           command: npm ci
           timeout_minutes: 10
           max_attempts: 3
+          on_retry_command: |
+            git config pull.rebase >&- || git config pull.rebase true
+            git config --global user.email "github-actions[bot]@users.noreply.github.com"
+            git config --global user.name "github-actions[bot]"
+            npm install
+            git add package.json
+            git add package-lock.json
+            git commit -m "synced package.json and package-lock.json"
+            git push
       - name: Fetch Quartz Theme
         uses: nick-fields/retry@v3
         with:
